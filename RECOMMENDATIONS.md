@@ -48,6 +48,65 @@ This document provides a comprehensive analysis of the current B2B Sales Agentic
 - LangGraph: 4 agents (Address Validation, Fulfillment, Service Activation, Post Activation)
 - RAG: 4 agents (Product/Order/Service/Fulfillment Policy)
 
+### Complete Framework Alignment Analysis
+
+| Agent | Current Framework | Task Description | Assessment | Recommended Framework | Priority |
+|-------|-------------------|------------------|------------|----------------------|----------|
+| **Super Agent** | ADK + Gemini 2.0 | Orchestrate 15 agents, manage conversations, route requests, intent recognition | ✅ **EXCELLENT** | **Keep ADK + Gemini** | - |
+| **Prospect Agent** | ADK | Qualify business leads via CRM MCP lookup (employee count, industry checks) | ✅ **GOOD** | **Keep ADK** | - |
+| **Lead Gen Agent** | ADK | Score & enrich leads via **external REST API** calls to data providers | ⚠️ **UPGRADE** | **Strands SDK** | 🟡 MEDIUM |
+| **Order Agent** | ADK | Process orders with **A2A orchestration** (Order → Serviceability → Fulfillment) | ✅ **GOOD** | **Keep ADK** | - |
+| **Serviceability Agent** | Strands SDK | Check network coverage via **MCP protocol** (database query, not REST) | ❌ **MISALIGNED** | **ADK** | 🔴 HIGH |
+| **Offer Agent** | Strands SDK | Generate quotes via **A2A to Policy Agents** + pricing calculations | ⚠️ **RECONSIDER** | **ADK** (or keep if external API planned) | 🟡 MEDIUM |
+| **Post Order Comm** | Strands SDK | Send emails/SMS via **external REST APIs** (SendGrid, Twilio, etc.) | ✅ **PERFECT** | **Keep Strands SDK** | - |
+| **Address Validation** | LangGraph | Validate address via **single USPS API call** → standardize → return | ❌ **OVERKILL** | **Strands SDK** | 🔴 HIGH |
+| **Fulfillment** | LangGraph | Equipment assignment + installation scheduling (multi-step: inventory → reserve → schedule → assign technician) | ⚠️ **UNDERUTILIZED** | **Keep LangGraph BUT implement properly** | 🟠 ENHANCE |
+| **Service Activation** | LangGraph | Provision network services (validate install → configure port → assign IP → test → activate billing → send credentials) | ⚠️ **UNDERUTILIZED** | **Keep LangGraph BUT leverage features** | 🟠 ENHANCE |
+| **Post Activation** | LangGraph | Update billing + CRM + send emails (**4 independent parallel API calls**) | ❌ **OVERKILL** | **Strands SDK** | 🔴 HIGH |
+| **Product Policy** | RAG (ChromaDB) | Retrieve product info, pricing, packages from policy documents | ✅ **PERFECT** | **Keep RAG** | - |
+| **Order Policy** | RAG (ChromaDB) | Retrieve order terms, discounts, cancellation policies from docs | ✅ **PERFECT** | **Keep RAG** | - |
+| **Service Policy** | RAG (ChromaDB) | Retrieve SLAs, support hours, service guarantees from docs | ✅ **PERFECT** | **Keep RAG** | - |
+| **Fulfillment Policy** | RAG (ChromaDB) | Retrieve installation procedures, equipment specs from docs | ✅ **PERFECT** | **Keep RAG** | - |
+
+### Framework Selection Rationale
+
+#### Why Current Framework Doesn't Fit vs Why Recommended Fits Better
+
+**Address Validation Agent:**
+- ❌ **Why LangGraph doesn't fit:** No workflow complexity - just one API call with response parsing. No state machine, no conditionals, no graph features used. LangGraph adds ~500 lines of unnecessary abstraction.
+- ✅ **Why Strands SDK fits better:** Designed specifically for REST API integration. Built-in retry logic with exponential backoff. Configurable timeouts and error handling. 80% code reduction (from ~150 lines to ~30 lines). Faster execution (no graph overhead).
+
+**Post Activation Agent:**
+- ❌ **Why LangGraph doesn't fit:** No conditional workflow - all tasks are independent. No state to maintain between calls. Simple parallel execution pattern. Can be done with `asyncio.gather()`.
+- ✅ **Why Strands SDK fits better:** Specialized for multiple REST API calls. Built-in parallel API call support. Individual error handling per API. 70% code reduction.
+
+**Serviceability Agent:**
+- ❌ **Why Strands SDK doesn't fit:** Uses MCP protocol for internal data access, not REST APIs. Strands SDK features (REST client, service discovery) are unused. This is an internal database query, not external service integration.
+- ✅ **Why ADK fits better:** Better alignment with MCP tools. Consistent with Prospect Agent (also uses MCP). Simpler implementation for internal queries. Better architectural consistency.
+
+**Lead Generation Agent:**
+- ❌ **Why ADK is suboptimal:** Primary task is calling external data provider APIs. No built-in retry logic, timeout handling, or circuit breaker for failing services.
+- ✅ **Why Strands SDK fits better:** Built-in retry logic (exponential backoff). Automatic timeout handling. Circuit breaker pattern prevents cascade failures. Response caching for duplicate requests. Better production reliability.
+
+**Offer Agent:**
+- ⚠️ **Why current choice is questionable:** Uses A2A protocol primarily (to Policy Agents), not REST. Strands SDK not adding value for internal communication.
+- ✅ **Why ADK might fit better:** Aligns with A2A communication pattern. **Exception:** Keep Strands if future integration with external pricing APIs is planned.
+
+**Fulfillment & Service Activation Agents:**
+- ⚠️ **Why current implementation is incomplete:** Using LangGraph but implementing as linear workflow. Not using StateGraph, conditional edges, or checkpointing features that justify the framework choice.
+- ✅ **Why proper LangGraph implementation is needed:** Multi-step workflow with conditionals (equipment available? → reserve vs backorder). Needs state management. Human-in-loop for installation confirmation. Retry logic built into graph. Checkpointing for long-running workflows.
+
+### Decision Matrix: When to Use Each Framework
+
+| Task Characteristics | Recommended Framework | Rationale |
+|---------------------|----------------------|-----------|
+| Knowledge retrieval from documents | **RAG (ChromaDB)** | Grounded factual responses, easy doc updates, prevents hallucinations |
+| Single external REST API call | **Strands SDK** | Built-in retry, timeout, error handling for external services |
+| Multiple parallel external APIs | **Strands SDK** | Parallel execution with individual error handling |
+| Multi-step workflow with conditionals | **LangGraph** | State machine with conditional routing, retry, human-in-loop |
+| Agent orchestration via A2A | **ADK** | Lightweight, direct LLM integration, A2A protocol support |
+| Internal data access (MCP/Database) | **ADK** | Simple query/response, MCP tool integration |
+
 **Issues Identified:**
 
 | Issue | Severity | Agents Affected | Impact |
