@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic Sales - Telemetry Dashboard</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+
+<body>
+    <div class="dashboard">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <h1>🔬 Agentic Sales Telemetry</h1>
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span id="status-text">Live</span>
+            </div>
+        </header>
+
+        <!-- Main Grid -->
+        <div class="dashboard-grid">
+            <!-- Database Metrics -->
+            <div class="card">
+                <h2>💾 Database (SQLite)</h2>
+                <div class="metrics-grid">
+                    <div class="metric">
+                        <div class="metric-value" id="db-conversations">0</div>
+                        <div class="metric-label">Conversations</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="db-messages">0</div>
+                        <div class="metric-label">Messages</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="db-invocations">0</div>
+                        <div class="metric-label">Agent Calls</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="db-orders">0</div>
+                        <div class="metric-label">Orders</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RAG Metrics - Removed due to separate instance issue
+            <div class="card">
+                <h2>📚 RAG System (ChromaDB)</h2>
+                <p style="color: #999; font-size: 13px;">Note: RAG works in chat but not visible in telemetry due to separate process instances</p>
+            </div>
+            -->
+
+            <!-- Agent Metrics -->
+            <div class="card">
+                <h2>🤖 Agents</h2>
+                <div class="metrics-grid">
+                    <div class="metric">
+                        <div class="metric-value" id="agent-count">0</div>
+                        <div class="metric-label">Registered Agents</div>
+                    </div>
+                </div>
+                <div class="agents-list" id="agents-list"></div>
+            </div>
+
+            <!-- Recent Conversations -->
+            <div class="card wide">
+                <h2>💬 Recent Conversations</h2>
+                <div class="table-container">
+                    <table id="conversations-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Started</th>
+                                <th>Status</th>
+                                <th>Messages</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="conversations-tbody">
+                            <tr>
+                                <td colspan="5" class="loading">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- RAG Collections Detail - Removed (not functional in telemetry)
+            <div class="card wide">
+                <h2>📖 RAG Collections Detail</h2>
+                <p>RAG system works in chat queries but cannot be displayed in telemetry</p>
+            </div>
+            -->
+
+            <!-- Live Activity Log -->
+            <div class="card wide">
+                <h2>📊 Live Activity</h2>
+                <div class="activity-log" id="activity-log">
+                    <div class="activity-item">
+                        <span class="activity-time">Waiting for activity...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+
+</html>

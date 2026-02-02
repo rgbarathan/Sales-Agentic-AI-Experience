@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic Sales System - B2B Sales Assistant</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Chat Container -->
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages">
+                    <div class="welcome-message">
+                        <h2>Welcome to Your B2B Sales Assistant</h2>
+                        <p>I'm here to help you find the perfect business internet and communication solutions for your
+                            company. Just start chatting or use the quick actions on the right!</p>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="chat-input-container">
+                    <div class="input-wrapper">
+                        <textarea id="message-input" placeholder="Type your message here..." rows="1"
+                            onkeydown="handleKeyPress(event)"></textarea>
+                        <button id="send-button" onclick="sendMessage()">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="input-hint">
+                        Press Enter to send • Shift+Enter for new line
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3>⚡ Actions</h3>
+                    <button class="quick-action" onclick="sendQuickMessage('What internet plans do you offer?')">
+                        📡 Get MSO Services
+                    </button>
+                    <button class="quick-action" onclick="sendQuickMessage('I need a quote')">
+                        💰 Get Quote
+                    </button>
+                    <button class="quick-action"
+                        onclick="sendQuickMessage('Check if service is available at my address')">
+                        📍 Check Availability
+                    </button>
+                    <button class="quick-action" onclick="sendQuickMessage('Tell me about voice services')">
+                        📞 Voice Services
+                    </button>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Agent Status</h3>
+                    <div id="agent-status" class="agent-list">
+                        <div class="loading">Loading...</div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Quick Info</h3>
+                    <div class="info-card">
+                        <p><strong>Services Available:</strong></p>
+                        <ul>
+                            <li>Business Internet (100M - 1G)</li>
+                            <li>Business Voice</li>
+                            <li>Managed WiFi</li>
+                            <li>Managed Security</li>
+                            <li>Cloud Backup</li>
+                        </ul>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Markdown renderer -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- App JavaScript with cache busting -->
+    <script src="/static/js/app.js?v=5"></script>
+</body>
+
+</html>
